@@ -8,7 +8,7 @@ Sample Docker Compose configuration for Iroha + Iroha Explorer (backend & web) +
 
 1. Clone the repo (with `--recurse-submodules`)
 2. Run docker compose
-3. Open http://localhost:8124 in browser
+3. Open http://localhost:8124 for the main frontend (http://localhost:8124/api/docs for interactive backend API docs)
 
 ```shell
 git clone --recurse-submodules https://github.com/0x009922/iroha_explorer_compose
