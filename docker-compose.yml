@@ -18,6 +18,12 @@ services:
     volumes:
       - ./config:/config:ro
     init: true
+    healthcheck:
+      test: test $(curl -s http://127.0.0.1:8080/status/blocks) -gt 0
+      interval: 2s
+      timeout: 1s
+      retries: 30
+      start_period: 4s
     command: |-
       /bin/bash -c "
           EXECUTOR_RELATIVE_PATH=$(jq -r '.executor' /config/genesis.json) && \\
@@ -103,4 +109,11 @@ services:
     ports:
       - 8124:80
 
-  # TODO: data producer service
+  producer:
+    build: ./producer
+    depends_on:
+      irohad0:
+        condition: service_healthy
+    environment:
+      TORII_URL: http://irohad0:8080
+    init: true
