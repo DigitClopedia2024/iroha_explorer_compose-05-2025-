@@ -4,6 +4,13 @@ Sample Docker Compose configuration for Iroha + Iroha Explorer (backend & web) +
 
 ## Usage
 
-1. Clone this repo <b>and git submodules</b>
-2. Run `docker-compose up`
-3. Open `http://localhost:8124` in browser
+**Prerequisites:** Docker and Docker Compose (or podman-compose).
+
+1. Clone the repo (with `--recurse-submodules`)
+2. Run docker compose
+3. Open http://localhost:8124 in browser
+
+```shell
+git clone --recurse-submodules https://github.com/0x009922/iroha_explorer_compose
+docker-compose up # or podman-compose
+```
