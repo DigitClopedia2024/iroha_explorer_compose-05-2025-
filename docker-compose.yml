@@ -90,6 +90,9 @@ services:
       IROHA_EXPLORER_TORII_URLS: http://irohad0:8080,http://irohad1:8081,http://irohad2:8082,http://irohad3:8083
       IROHA_EXPLORER_IP: 0.0.0.0
       IROHA_EXPLORER_PORT: 8123
+    # NOTE: useful for local frontend development, outside of the compose
+    ports:
+      8123:8123
     init: true
 
   iroha_explorer_web:
