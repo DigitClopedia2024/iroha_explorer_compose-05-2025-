@@ -1,0 +1,6 @@
+[submodule "iroha2-block-explorer-backend"]
+	path = explorer_backend
+	url = https://github.com/soramitsu/iroha2-block-explorer-backend.git
+[submodule "explorer_web"]
+	path = explorer_web
+	url = https://github.com/soramitsu/iroha2-block-explorer-web.git
