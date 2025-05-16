@@ -7,7 +7,7 @@ const TORII_URL = Deno.env.get("TORII_URL");
 assert(TORII_URL, "Please set TORII_URL env var");
 
 const TXS_CHUNK = 20;
-const PUSH_DELAY = 100;
+const PUSH_DELAY = 1500;
 
 const CHAIN = `00000000-0000-0000-0000-000000000000`;
 const ACCOUNT = `ed0120CE7FA46C9DCE7EA4B125E2E36BDB63EA33073E7590AC92816AE1E861B7048B03@wonderland`;
@@ -27,7 +27,7 @@ while (true) {
       types.Executable.Instructions([
         types.InstructionBox.Log({
           msg: "Hello, world!",
-          level: types.Level.INFO,
+          level: types.Level.DEBUG,
         }),
       ]),
       {
