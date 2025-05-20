@@ -1,8 +1,8 @@
 [submodule "explorer_backend"]
 	path = explorer_backend
-	url = git@github.com:soramitsu/iroha2-block-explorer-backend.git
+	url = https://github.com/soramitsu/iroha2-block-explorer-backend.git
 	branch = update-dockerfile
 [submodule "explorer_web"]
 	path = explorer_web
-	url = git@github.com:soramitsu/iroha2-block-explorer-web.git
+	url = https://github.com/soramitsu/iroha2-block-explorer-web.git
 	branch = docker-caddy
