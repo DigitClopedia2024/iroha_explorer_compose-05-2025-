@@ -1555,7 +1555,13 @@ This is actually a good thing\! It means your Iroha network is alive, processing
 https://github.com/DigitClopedia2024/iroha\_explorer\_compose-05-2025-/blob/master/producer/mod.ts
 
 it has following code:
-```TS
+<details>
+<summary>
+content of MOd.ts File inside the producer cirectory ...
+</summary>
+Unfold the original code
+
+TS
 import { Client } from "@iroha/client";
 
 import \* as types from "@iroha/core/data-model";
@@ -1631,7 +1637,7 @@ async function produceChunk(cb: () \=\> Promise\<void\>) {
   await Array.fromAsync({ length: TXS\_CHUNK }, () \=\> cb());
 
 }
-```
+</details>
 
 You are absolutely right\! It is indeed `mod.ts` that contains the Deno/TypeScript code for the producer. The `deno task run` command in the `Dockerfile` would then execute this `mod.ts` file.
 
@@ -1658,8 +1664,8 @@ Its like to connect in a real computer network different computers. E.g. one com
 
 ... same now we can connect different docker environments, e.g. lets say: we have a wallet address for web3 crypto token transactions, we have a swapping platform to exchange crypto tokens and we hvae an explorer where we run the smart contracts for the blockchain. So in total we have 4 different applicatoins: blockchain, explorer/smart contracts, swapping and wallet for this specific blockchain.
 
-We define a common network where we identify specific port addresses for the API and the end points ... and then all can communciate with each other as we define it, e.g. I can transfer my tokens from the blockchain into my wallet, then I use the wallet on the swapping platform to exchange my token e.g. into stable coins ... and in the background then the blockchain and the smart contracts with the explorer define these funcotins. Right ?
-----------------------------
+We define a common network where we identify specific port addresses for the API and the end points ... and then all can communciate with each other as we define it, e.g. I can transfer my tokens from the blockchain into my wallet, then I use the wallet on the swapping platform to exchange my token e.g. into stable coins ... and in the background then the blockchain and the smart contracts with the explorer define these funcotins. **Right ?**
+
 Yes, your understanding is absolutely spot-on\! You've grasped the core concept of how Docker (and specifically Docker Compose) builds and manages isolated yet interconnected environments, much like a traditional computer network.
 
 Let's break down your excellent analogy and confirm your conclusions:
