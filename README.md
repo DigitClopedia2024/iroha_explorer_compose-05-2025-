@@ -12,7 +12,7 @@ This fork is currently under active development and internal testing by the Digi
 
 **Important Disclaimer for Documentation:**
 
-Please note that files within this repository, particularly documents like `[Iroha CLI (inside Iroha Composer - 28052025-1).md] (https://github.com/DigitClopedia2024/iroha_explorer_compose-05-2025-/blob/feature/Iroha-CLI-Integration/Iroha%20CLI%20(inside%20Iroha%20Composer%20-%2028052025-1).md)` (or similar protocol files), are **internal discussion protocols and working notes**. They reflect our ongoing investigations, tests, and conversations.
+Please note that files within this repository, particularly documents like `[Iroha CLI (inside Iroha Composer - 28052025-1).md](https://github.com/DigitClopedia2024/iroha_explorer_compose-05-2025-/blob/feature/Iroha-CLI-Integration/Iroha%20CLI%20(inside%20Iroha%20Composer%20-%2028052025-1).md)` (or similar protocol files), are **internal discussion protocols and working notes**. They reflect our ongoing investigations, tests, and conversations.
 
 **These documents are NOT intended as official or trustworthy installation guides, definitive architectural blueprints, or stable feature documentation for the original project.** They are raw, work-in-progress content and may contain unverified information, preliminary findings, or specific configurations relevant only to our current testing environment.
 
