@@ -16,7 +16,7 @@ and even and offered a detailled installation.md file
 
 [https://github.com/DigitClopedia2024/iroha2-block-explorer-web/blob/1e45d258f9c37cbf0d1bb07fef1e73225fe7139a/installation.md](https://github.com/DigitClopedia2024/iroha2-block-explorer-web/blob/1e45d258f9c37cbf0d1bb07fef1e73225fe7139a/installation.md) 
 
-Yet the problems are penetrant, and the developer of the backend (Block Explorer) even drove crazy and started to create this "all runs in a docker environment".
+Yet the problems are penetrant, and the developer of the backend (Block Explorer) even decided to come into action and started to create this "all runs in a docker environment".
 
 We have forked the repository ...
 
