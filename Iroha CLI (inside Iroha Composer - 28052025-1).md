@@ -744,27 +744,29 @@ You have a few primary ways to access the Iroha CLI or perform CLI-like operatio
 This is the most common and direct method to get an interactive shell inside a running container and then use the tools available within that container.
 
 **Ensure your Docker Compose services are running:**  
-Bash  
+```Bash  
 docker-compose up \-d
-
+```
 1. (You've already done this, and it looks like your containers are healthy.)  
 2. **Find the name of the Iroha container:** You already ran `docker ps`, which is perfect. Look for the container running the `hyperledger/iroha:2.0.0-rc.2.0` image. For example, your output shows `iroha_explorer_compose-05-2025--irohad0-1`.
 
 **Execute a shell inside the container:** Use `docker exec` to open an interactive bash or sh shell inside the running Iroha node container. Since `irohad0` is your main node, let's target that one:
 
-Bash  
+```Bash  
 docker exec \-it iroha\_explorer\_compose-05-2025--irohad0-1 /bin/bash  
 \# Or, if bash isn't available, try:  
 \# docker exec \-it iroha\_explorer\_compose-05-2025--irohad0-1 sh
-
+```
 3. Once inside the container's shell, you should have access to the `iroha` (or `iroha-cli`) command if it's included in that specific Docker image.
 
 **Use the Iroha CLI:** From within the container's shell, you can now run `iroha` commands. You will need to specify the peer address (which will be `127.0.0.1:8080` if connecting to `irohad0` from within its own container, or `irohad0:8080` if you were to exec into another container that could reach `irohad0` via the Docker network).  
-Example of using `iroha-cli` (if it's named `iroha-cli` within the image):  
-Bash  
-iroha-cli \--account\_name admin@test \--peer localhost:8080
 
+Example of using `iroha-cli` (if it's named `iroha-cli` within the image):  
+```Bash  
+iroha-cli \--account\_name admin@test \--peer localhost:8080
+```
 4. You'll need to know the account name and its private key or have access to it for signing transactions. The `genesis.json` defines `ed0120CE7FA46C9DCE7EA4B125E2E36BDB63EA33073E7590AC92816AE1E861B7048B03@wonderland` as an account. The corresponding private key is in your `docker-compose.yml` for `iroha_explorer_backend`.  
+
    **Important Note:** The `hyperledger/iroha:2.0.0-rc.2.0` image might not contain the `iroha-cli` directly by default. The `iroha-cli` is often a separate binary. If `iroha` or `iroha-cli` command is not found, you'll need to install it inside the container (not recommended as changes are lost on restart) or use a dedicated `iroha-client-cli` image.
 
 #### **2\. Add a Dedicated CLI Service to your `docker-compose.yml`**
@@ -772,8 +774,7 @@ iroha-cli \--account\_name admin@test \--peer localhost:8080
 This is a more robust and recommended approach if you need frequent CLI access. Iroha often provides a specific Docker image for its client CLI (e.g., `hyperledger/iroha:client-cli` or similar).
 
 **Add a new service to your `docker-compose.yml`:** You would add a new service that uses the Iroha CLI image. This service can then connect to your running `irohad` nodes.  
-```
-YAML  
+```YAML  
 \# ... (existing services) ...
 
 iroha\_cli\_tool:  
@@ -794,13 +795,11 @@ iroha\_cli\_tool:
 ```
 
 1. **Start or restart your Docker Compose services:**  
-```
-Bash  
+```Bash  
 docker-compose up \-d \--build iroha\_cli\_tool \# Build and start only this service, or \`docker-compose up \-d\` for all
 ```
 2. **Exec into this new CLI container:**  
-```
-Bash  
+```Bash  
 docker exec \-it iroha\_explorer\_compose-05-2025--iroha\_cli\_tool-1 /bin/bash
 ```
 3. Now, from within this container, you should be able to run `iroha-cli` commands, potentially utilizing the environment variables you set for configuration.
@@ -815,7 +814,9 @@ If your goal is to automate tasks or integrate Iroha with other applications, us
 
 * **"I checked inside the containers, if there is the copy of the respositories, but nothing..."** This is expected. Docker images are built from `Dockerfile`s, and generally, they only contain the compiled binaries and necessary runtime files, not the entire source code repository. The `build: ./explorer_backend` line in `docker-compose.yml` tells Docker to build an image from the `explorer_backend` directory, implying a `Dockerfile` exists there which compiles and copies the backend application into the image. Similarly for `explorer_web` and `producer`. The `irohad` images are pulled directly from Docker Hub (`hyperledger/iroha:2.0.0-rc.2.0`).  
 * **`docker-compose.yaml` inside `defaults` sub-directory for blockchain:** The `docker-compose.yml` you provided is the *main* Docker Compose file that orchestrates *all* the services. The Iroha blockchain itself doesn't need a `docker-compose.yaml` inside its running container. It's configured via environment variables and mounted volumes (`./config:/config:ro`) as defined in the main `docker-compose.yml`. The `genesis.json` is loaded from the mounted `/config` directory within the `irohad0` container.  
+
 * **`cargo.toml` file:** Similar to the repository comment above, `cargo.toml` is a Rust project file for building. It's used *during the build process* of the Iroha binary, not typically present or needed in the final running Docker image unless you're trying to recompile something inside the container (which you generally wouldn't do for a running node).  
+
 * **JSON errors / 502 Gateway errors:** Your AI hint was likely correct. When services are in separate environments (one in Docker, one outside), network communication often breaks down. Docker containers live on their own internal network. For a Docker container to talk to something *outside* the Docker network, or for something *outside* to talk to something *inside*, ports need to be explicitly published (`ports:`) or networking configurations adjusted. The developer's move to put everything in Docker Compose addresses this by allowing services to resolve each other by their service names (e.g., `irohad0`, `iroha_explorer_backend`) within the shared Docker network. The `ports: - 8124:8080` for `iroha_explorer_web` exposes port 8080 *inside* the container to port 8124 on your host machine, making the web UI accessible from your browser.  
 * **"Producer" simulating the CLI:** Yes, the `producer` is essentially a simple program (written in Deno/TypeScript) that uses the Iroha client library to send transactions to the Iroha network. This demonstrates a programmatic way to interact, but it's not the interactive command-line interface `iroha-cli` that you're looking for to manually issue commands.  
 * **Pre-defined domains/assets in `genesis.json`:** This is standard practice for setting up an initial blockchain state. For permissioned blockchains like Iroha, you typically define initial domains, accounts, and asset definitions in a genesis block. This ensures a consistent starting point for the network. While you *can* create these via the CLI after the network starts, defining them in `genesis.json` simplifies deployment and ensures the network is immediately functional with a base set of entities. The CLI would be used for *further* interactions and changes after this initial setup.
@@ -857,8 +858,7 @@ This is the most straightforward way to get the CLI *outside* the Docker environ
    * However, your `docker-compose.yml` does *not* expose port `8080` of `irohad0` to your host machine. It only exposes `8124` for the `iroha_explorer_web` service.
 
 **To connect the `iroha-cli` from your host to `irohad0`, you need to add a `ports` mapping to the `irohad0` service in your `docker-compose.yml`:**  
-```
-YAML  
+```YAML  
 services:  
   irohad0:  
     image: hyperledger/iroha:2.0.0-rc.2.0  
@@ -869,8 +869,7 @@ services:
 ```
 After adding this, run `docker-compose up -d --force-recreate irohad0` to apply the change.  
 Now, from your host machine, you can use `iroha-cli` and point it to `localhost:8080`:  
-```
-Bash  
+```Bash  
 \# Example using iroha-cli on your host  
 iroha-cli \--peer localhost:8080 \--account\_id ed0120CE7FA46C9DCE7EA4B125E2E36BDB63EA33073E7590AC92816AE1E861B7048B03@wonderland \--private\_key 802620CCF31D85E3B32A4BEA59987CE0C78E3B8E2DB93881468AB2435FE45D5C9DCD53 instruction \<your\_instruction\>
 ```
@@ -881,8 +880,7 @@ iroha-cli \--peer localhost:8080 \--account\_id ed0120CE7FA46C9DCE7EA4B125E2E36B
 If you want to keep everything containerized, or if installing Rust/Cargo on your host is undesirable, you can create a new Docker image that specifically includes the `iroha-cli`.
 
 **Create a new `Dockerfile` for the CLI:** In a new directory (e.g., `iroha_cli_docker/`), create a `Dockerfile`:  
-```
-Dockerfile  
+```Dockerfile  
 \# Start from a base image that supports Rust/Cargo if you need to build  
 FROM rust:latest as builder
 
@@ -914,8 +912,7 @@ CMD \["/bin/bash"\]
 1. *Self-correction:* The path to `iroha-cli` in Iroha 2.0.0-rc.2.0 is often `/client_cli/` or `/tools/cli/`. You'll need to verify this in the actual Iroha 2.0.0-rc.2.0 repository.
 
 **Add a new service to your `docker-compose.yml`:**  
-```
-YAML  
+```YAML  
 \# ... (existing services) ...
 
 iroha\_custom\_cli:  
@@ -934,13 +931,11 @@ docker-compose up \-d \--build iroha\_custom\_cli
 ```
 
 3. **Exec into your custom CLI container:**  
-```
-Bash  
+```Bash  
 docker exec \-it iroha\_explorer\_compose-05-2025--iroha\_custom\_cli-1 /bin/bash
 ```
 Now, inside this container, you should be able to run `iroha-cli` commands. Since this container is on the same Docker network as `irohad0`, it can resolve `irohad0` by its service name.  
-```
-Bash  
+```Bash  
 \# Inside the iroha\_custom\_cli container  
 iroha-cli \--peer irohad0:8080 \--account\_id $IROHA\_EXPLORER\_ACCOUNT \--private\_key $IROHA\_EXPLORER\_ACCOUNT\_PRIVATE\_KEY instruction \<your\_instruction\>
 ```
@@ -971,9 +966,7 @@ Applicatoin C \= Web UI front end : Frontned runs via docker command (not docker
 So we had 3 different environments:
 
 \- docker-compose
-
 \- nginx web server
-
 \- docker
 
 ... and this created the conflicts that we didnt get the records from the SQlite databse (Block explorer) visible in the front end.
@@ -982,7 +975,7 @@ So we had 3 different environments:
 
 **You are absolutely correct that applications in different, isolated Docker environments (or a Docker environment and the host) cannot communicate *by default*. This is precisely why the developer moved everything into one `docker-compose.yml` file.**
 
-My apologies for any confusion. Let's break down the networking and how it affects your ability to use the CLI.
+Let's break down the networking and how it affects your ability to use the CLI.
 
 ### **The Core Problem: Docker Network Isolation**
 
@@ -992,12 +985,14 @@ When you run separate `docker-compose` projects, or a `docker-compose` project a
   * `docker-compose` network (for Iroha A)  
   * Host network (for Block Explorer B)  
   * Another `docker` network (for Web UI C) They couldn't talk to each other without explicit port mappings and potentially complex network configurations (like Docker overlays or `host` networking for containers, which can have security implications). This was the source of your JSON/502 errors.  
+
 * **Scenario 2 (The new Composer setup):**  
-  * **All services (`irohad0`, `irohad1`, `iroha_explorer_backend`, `iroha_explorer_web`, `producer`) are now part of the *same* Docker network defined by your single `docker-compose.yml` file.** This is the key. Within this single Docker Compose network, services can communicate with each other using their service names (e.g., `iroha_explorer_backend` can reach `irohad0:8080`). This is why the developer's new setup successfully integrates everything.
+  * *All services* (`irohad0`, `irohad1`, `iroha_explorer_backend`, `iroha_explorer_web`, `producer`) are now part of the
+  * *same* Docker network defined by your single `docker-compose.yml` file.** This is the key. Within this single Docker Compose network, services can communicate with each other using their service names (e.g., `iroha_explorer_backend` can reach `irohad0:8080`). This is why the developer's new setup successfully integrates everything.
 
 ### **Re-evaluating CLI Access within the New Unified Docker Compose Environment**
 
-Now, let's address your core question: "Can we get the function of the CLI back in this new Composer environment?"
+Now, let's address your core question: "*Can we get the function of the CLI back in this new Composer environment?*"
 
 Yes, you absolutely can, but the method depends on whether you want the CLI *inside* a container or *outside* on your host machine.
 
@@ -1033,12 +1028,15 @@ iroha\_cli\_tool:
     \# or if it's set as an ENV in the custom Dockerfile.  
   depends\_on:  
     irohad0:  
-      condition: service\_healthy \# Ensure Iroha node is up before CLI is useful```
+      condition: service\_healthy \# Ensure Iroha node is up before CLI is useful
+```
 
-4. **Run Docker Compose:**  
+4. **Run Docker Compose:** 
+
 ```Bash  
 docker-compose up \-d \--build iroha\_cli\_tool \# Build and start the new CLI service  
-\# Or just \`docker-compose up \-d\` to restart everything if you made other changes```
+\# Or just \`docker-compose up \-d\` to restart everything if you made other changes
+```
 
 5. **Access the CLI:** Once the `iroha_cli_tool` container is running, you can `docker exec` into it:  
 
@@ -1059,6 +1057,7 @@ This is the scenario where you want to run `iroha-cli` directly on your host mac
 1. **Install `iroha-cli` on your host:** As discussed, you'll need to download a pre-compiled binary or build it from source on your host OS. This has nothing to do with Docker.
 
 **Expose Iroha API Ports to the Host:** This is the *critical step* that enables communication. For your host machine to talk to a container, the container's port *must be published* to the host. Your current `docker-compose.yml` only publishes `iroha_explorer_web`'s port 8080 to host's 8124 (`8124:8080`). The `irohad` nodes (like `irohad0` on port 8080\) are *not* exposed to the host by default.  
+
 **You *must* modify your `docker-compose.yml` to expose `irohad0`'s API port:**  
 ```YAML  
 services:  
