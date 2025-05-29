@@ -26,17 +26,10 @@ The start was very easy, just clone the repository and start to run the docker-c
 
 *Or here the copy:*
 <details>
-
 <summary>
-
-summary
-
+Unfold for the docker-compose.yml file code:
 </summary>
 
-details</details>
-
-
-<details>
 \# TODO: set up shutdown/restart policies
 
 services:
