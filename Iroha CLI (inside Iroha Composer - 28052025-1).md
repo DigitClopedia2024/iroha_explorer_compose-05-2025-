@@ -12,7 +12,7 @@ We are in troubles now since one months, as its not at all clear what the develo
 
 [https://github.com/soramitsu/iroha2-block-explorer-web/issues/99](https://github.com/soramitsu/iroha2-block-explorer-web/issues/99) 
 
-and even and offered a detailled installation.md file
+and even offered a detailled installation.md file
 
 [https://github.com/DigitClopedia2024/iroha2-block-explorer-web/blob/1e45d258f9c37cbf0d1bb07fef1e73225fe7139a/installation.md](https://github.com/DigitClopedia2024/iroha2-block-explorer-web/blob/1e45d258f9c37cbf0d1bb07fef1e73225fe7139a/installation.md) 
 
@@ -258,7 +258,8 @@ TORII\_URL: http://irohad0:8080
 
 init: true
 
-\---------------------------------
+\
+---------------------------------
 
 **You can see in the respository, that the developer copies all three repositories and arranges that they get installed (from blockchain Iroha V2, to backend (Block explorer) to front end (Web UI Explorer).**
 
