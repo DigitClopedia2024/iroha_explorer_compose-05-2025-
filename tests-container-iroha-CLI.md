@@ -5,7 +5,6 @@ This document details the installation process and subsequent verification steps
 The initial deployment attempt of the `iroha_cl_admin` service encountered a dependency error due to the main Iroha node (`irohad0`) not yet being healthy. This document outlines the resolution (a full restart of all services) and confirms the operational status of all containers.
 
 Following the successful container bring-up, this protocol describes the methods used to confirm the correct installation and inter-container communication, specifically focusing on the Iroha CLI's ability to interact with the blockchain. Subsequent sections will log the execution and results of various CLI commands for registering domains, asset definitions, and querying blockchain state.
---------------------------
 
 1. ***New Container Iroha CLI***
 
