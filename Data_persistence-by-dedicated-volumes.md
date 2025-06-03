@@ -40,7 +40,7 @@ This is the preferred method for managing persistent data with Docker Compose. D
 
 1.  **Define Named Volumes:** Add a `volumes` section at the top level of your `docker-compose.yml` (usually after `services:` and before `networks:`). Define a unique named volume for each Iroha node (`irohad0`, `irohad1`, `irohad2`, `irohad3`) to ensure their data is isolated.
 
-    ```yaml
+  ```yaml
     # Add this section at the top level of your docker-compose.yml
     # (e.g., directly below the 'services:' block, before 'networks:')
     volumes:
@@ -48,9 +48,10 @@ This is the preferred method for managing persistent data with Docker Compose. D
       iroha_data_1:
       iroha_data_2:
       iroha_data_3:
-    ```
+  ```
 Here's how your docker-compose.yml structure would look, highlighting where the top-level volumes: block should go if you chose Option 1 (Docker Named Volumes):
-    ```yaml
+
+  ```yaml
     # TODO: set up shutdown/restart policies
     services:
       # Iroha
@@ -84,7 +85,7 @@ Here's how your docker-compose.yml structure would look, highlighting where the 
         #   default:
         #     name: iroha_network
         # ... etc ...
-    ```
+  ```
 
 2.  **Mount Named Volumes to Services:** Update the `volumes` section for *each* `irohad` service (`irohad0`, `irohad1`, `irohad2`, `irohad3`) to mount its respective named volume to the Iroha data path (`/var/lib/iroha`) inside the container.
 
