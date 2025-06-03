@@ -168,7 +168,7 @@ Follow these steps to apply the persistent volume configuration to your Iroha V2
     *  For **Docker Bind Mount** option 2 you dont need to ad the top-level volumes, just add the specific code line to the volumes definition itself as described (e.g. ./data/irohad0:/var/lib/iroha ). 
     * For **both** options, update the `volumes:` section for *each* of your `irohad0`, `irohad1`, `irohad2`, and `irohad3` services, adding the new line that maps the persistent data path to `/var/lib/iroha` (or your specific Iroha data path).
 3.  **Save the `docker-compose.yml` file.**
-4.  **File Permissions for data/irohadX Directories**
+4.1  **File Permissions for data/irohadX Directories**
 
 When you create directories like project-name/data/irohad0 with sudo mkdir, they are owned by root (owner: root, group: root).
 
@@ -187,6 +187,19 @@ $USER:$USER: This is a shell variable that expands to your current username and 
 project-name/data: The path to your data directory that contains irohad0, irohad1, etc.
 
 After changing the ownership, irohad processes inside the containers will be able to write to these directories, resolving the permission conflicts.
+
+4.2 **Anomalies** 
+
+with start of the docker compose system and the upper pathes of option 2 the logs showed blocks being committed and snapshots created, and that the web UI was working! This confirmed the Iroha nodes have indeed processed transactions.
+
+Yet, the fact that the host directories (./data/irohad0, etc.) remained empty was the key anomaly here. This strongly suggested that the data was being written to a different location inside the Docker container than the /var/lib/iroha path we've currently mapped.
+
+Based on recent Iroha V2 configurations, it appears that the default block store path has moved or is configurable. Specifically, the *storage engine* **Kura** (which the logs mention: iroha_core::kura: Kura init complete) often uses */storage* as its block store path by default, or it's controlled by an environment variable like *KURA_BLOCK_STORE_PATH*.
+
+The strong suspicion is that /var/lib/iroha is no longer the correct internal path for Iroha V2's blockchain data in our specific image version (2.0.0-rc.2.0). It is more likely to be */storage.*
+
+*Recommended Action*: **Update the Internal Container Path in docker-compose.yml**
+We try modifying our docker-compose.yml file to change the internal path of the bind mounts from /var/lib/iroha to /storage for irohad0, irohad1 till irohad3. Then follow again with following 5. and let do the command *docker compose up -d --build* on its own to create the new storage folders.
 
 5.  **Apply Changes and Recreate Containers:**
     * It is **CRUCIAL** to stop and remove your existing containers so that new ones can be created with the correct volume attachments.
