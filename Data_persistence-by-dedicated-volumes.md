@@ -127,10 +127,31 @@ Follow these steps to apply the persistent volume configuration to your Iroha V2
 
 1.  **Choose a Volume Option:** Decide whether you want to use Docker Named Volumes (recommended) or Bind Mounts to Host Directories.
 2.  **Edit `docker-compose.yml`:**
-    * If using **Docker Named Volumes**, add the top-level `volumes:` section as shown in Option 1.
+    * If using **Docker Named Volumes**, add the top-level `volumes:` section as shown in Option 1. 
+    *  For **Docker Bind Mount** option 2 you dont need to ad the top-level volumes, just add the specific code line to the volumes definition itself as described (e.g. ./data/irohad0:/var/lib/iroha ). 
     * For **both** options, update the `volumes:` section for *each* of your `irohad0`, `irohad1`, `irohad2`, and `irohad3` services, adding the new line that maps the persistent data path to `/var/lib/iroha` (or your specific Iroha data path).
 3.  **Save the `docker-compose.yml` file.**
-4.  **Apply Changes and Recreate Containers:**
+4.  **File Permissions for data/irohadX Directories**
+
+When you create directories like project-name/data/irohad0 with sudo mkdir, they are owned by root (owner: root, group: root).
+
+*Problem*: The process running inside your irohad0 Docker container typically does not run as the root user for security reasons. If the irohad application inside the container tries to write its blockchain data to /var/lib/iroha (which is mapped to your project-name/data/irohad0 on the host), and that host directory is only writable by root, the irohad process will encounter a "Permission Denied" error. This will absolutely lead to conflicts and prevent the container from becoming healthy, as it cannot write its essential data.
+
+*Solution*: You need to change the ownership of these host directories so that the user inside the Docker container has write permissions. The simplest and most common solution is to change the ownership of your data directory (and its contents) to the user you are running docker compose with on your host machine.
+
+Assuming you are running *docker compose* as your regular user (e.g., yourusername) by using sudo docker compose ..., you should change the ownership of the data directory to your user:
+
+```Bash
+sudo chown -R $USER:$USER project-name/data
+```
+sudo chown: Change owner command.
+-R: Recursive, applies to all subdirectories and files.
+$USER:$USER: This is a shell variable that expands to your current username and your primary group. This sets both the owner and the group to your user.
+project-name/data: The path to your data directory that contains irohad0, irohad1, etc.
+
+After changing the ownership, irohad processes inside the containers will be able to write to these directories, resolving the permission conflicts.
+
+5.  **Apply Changes and Recreate Containers:**
     * It is **CRUCIAL** to stop and remove your existing containers so that new ones can be created with the correct volume attachments.
     * Open your terminal in the directory where your `docker-compose.yml` file is located and run:
         ```bash
