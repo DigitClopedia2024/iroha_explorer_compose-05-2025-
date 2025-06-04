@@ -1,29 +1,30 @@
-##**Iroha Explorer Compose Project: Ensuring Robustness & Stability**
+# **Iroha Explorer Compose Project: Ensuring Robustness & Stability**
 
 This document details critical configurations and operational practices to eliminate "race effects" and "conflicts" during startup, guarantee data integrity, and maintain continuous oversight of your Hyperledger Iroha 2 blockchain network.
 
-###**Table of Contents**
+## **Table of Contents**
 
-Project Overview
-Critical: Data Persistence with Bind Mounts
-Why Persistence Matters
-Implementing Bind Mounts
-Essential: Host Directory Permissions
-Eliminating Startup Conflicts: Controlled Initialization
-Understanding the "Race Effect" and "Race Competition"
-The Solution: depends_on with condition: service_healthy
-Step-by-Step: Configuring Health Checks
-Step-by-Step: Defining Service Dependencies
-Why This Approach is Crucial for High-Value Systems
-Essential Operational Practices: Monitoring & Logging
-The Non-Negotiable Need for Visibility and Control
-How to Monitor Your Docker Containers
-What to Look For in Iroha Logs (Blockchain Health)
-Log Persistence Strategy for Audit & Analysis
-Current Status: Known Issues & Troubleshooting
-The Odd/Even Block Commitment Anomaly
+### Initial Trouble Shooting
+1. Project overview
+2. Critical: Data Persistence with Bind Mounts
+  Why Persistence Matters
+  Implementing Bind Mounts
+  Essential: Host Directory Permissions
+3. Eliminating Startup Conflicts: Controlled Initialization
+  Understanding the "Race Effect" and "Race Competition"
+  The Solution: depends_on with condition: service_healthy
+  Step-by-Step: Configuring Health Checks  
+  Step-by-Step: Defining Service Dependencies
+  Why This Approach is Crucial for High-Value Systems
+4. Essential Operational Practices: Monitoring & Logging
+  The Non-Negotiable Need for Visibility and Control
+  How to Monitor Your Docker Containers
+  What to Look For in Iroha Logs (Blockchain Health)
+  Log Persistence Strategy for Audit & Analysis
+5. Current Status: Known Issues & Troubleshooting
+  The Odd/Even Block Commitment Anomaly
 
-**Initial Troubleshooting for Consensus Issues**
+## **Initial Troubleshooting for Consensus Issues**
 
 1. **Project Overview**
 
