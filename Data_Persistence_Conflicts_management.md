@@ -1,8 +1,8 @@
-**Iroha Explorer Compose Project: Ensuring Robustness & Stability**
+##**Iroha Explorer Compose Project: Ensuring Robustness & Stability**
 
 This document details critical configurations and operational practices to eliminate "race effects" and "conflicts" during startup, guarantee data integrity, and maintain continuous oversight of your Hyperledger Iroha 2 blockchain network.
 
-**Table of Contents**
+###**Table of Contents**
 
 Project Overview
 Critical: Data Persistence with Bind Mounts
@@ -92,9 +92,9 @@ Think of it like starting a complex, high-performance engine in a critical syste
 
 Without this phased approach, Docker Compose, by default, will launch all services in parallel. This creates a "**race**" where:
 
-Iroha nodes might still be establishing peer-to-peer connections, synchronizing, or building initial blocks.
-Dependent services like the producer or iroha_cl_admin might try to send transactions or queries to an Iroha node that isn't yet ready, leading to failures.
-The iroha_explorer_backend might attempt to fetch data from an unresponsive Iroha node, and the iroha_explorer_web might fail if the backend isn't up.
+- Iroha nodes might still be establishing peer-to-peer connections, synchronizing, or building initial blocks.
+- Dependent services like the *producer* or *iroha_cl_admin* might try to send transactions or queries to an Iroha node that isn't yet ready, leading to failures.
+- The *iroha_explorer_backend* might attempt to fetch data from an unresponsive Iroha node, and the iroha_explorer_web might fail if the backend isn't up.
 
 **This chaotic startup is unacceptable for systems handling significant financial value.**
 
@@ -209,24 +209,26 @@ Operating any system, especially a blockchain handling high-value assets, withou
 
 **The Non-Negotiable Need for Visibility and Control**
 
-Proactive Issue Detection: Identify problems (e.g., consensus stalls, resource exhaustion, network anomalies) before they impact operations.
-Rapid Troubleshooting: Logs are your primary diagnostic tool, providing granular details about system behavior.
-Performance Optimization: Monitor resource usage to fine-tune configurations and prevent bottlenecks.
-Security & Audit: Maintain an immutable record of system events, crucial for forensic analysis, compliance, and auditing.
+*Proactive Issue Detection:* Identify problems (e.g., consensus stalls, resource exhaustion, network anomalies) before they impact operations.
+*Rapid Troubleshooting:* Logs are your primary diagnostic tool, providing granular details about system behavior.
+*Performance Optimization:* Monitor resource usage to fine-tune configurations and prevent bottlenecks.
+*Security & Audit:* Maintain an immutable record of system events, crucial for forensic analysis, compliance, and auditing.
 
 **How to Monitor Your Docker Containers**
 
-Verify Running Containers:
+*Verify Running Containers:*
 ```Bash
-
 sudo docker ps
+```
 This command shows the status of all active containers, including their STATUS (e.g., Up X minutes (healthy)), indicating they've passed their health checks.
-Real-time Resource Utilization:
+
+*Real-time Resource Utilization:*
 ```Bash
 sudo docker stats
 ```
 **Provides live metrics (CPU %, MEM USAGE, Network I/O, Disk I/O) for all running containers !** - Use this to identify any service experiencing resource bottlenecks or unusual spikes.
-View Service Logs: The docker compose logs command is your window into what each service is doing.
+*View Service Logs:* The docker compose logs command is your window into what each service is doing.
+
 View logs for a specific service:
 ```Bash
 sudo docker compose logs <service_name>
@@ -239,7 +241,6 @@ sudo docker compose logs -f <service_name>
 # Example: sudo docker compose logs -f irohad3
 
 View combined logs from all services:
-
 ```Bash
 sudo docker compose logs -f
 ```
@@ -247,10 +248,9 @@ sudo docker compose logs -f
 **What to Look For in Iroha Logs (Blockchain Health) ?**
 When analyzing your irohad node logs (e.g., irohad3-1):
 
-INFO consensus: iroha_core::sumeragi::main_loop: Block committed: The ultimate confirmation that a block was successfully added to the blockchain. This is the "all clear" signal.
-INFO consensus: iroha_core::sumeragi::main_loop: Block received: Indicates a block was proposed and received by the node, but does not guarantee it was committed to the local ledger.
-INFO consensus: iroha_core::sumeragi::main_loop: View changed to X: This is a critical indicator of a consensus failure. It means the current consensus round (view) could not finalize a block, often due to timeouts, a lack of quorum (not enough validators responding in time), or a leader failure. Frequent "view changes" point directly to network instability or node health issues.
-
+*INFO consensus:* iroha_core::sumeragi::main_loop: Block committed: The ultimate confirmation that a block was successfully added to the blockchain. This is the "all clear" signal.
+*INFO consensus:* iroha_core::sumeragi::main_loop: Block received: Indicates a block was proposed and received by the node, but does not guarantee it was committed to the local ledger.
+*INFO consensus:* iroha_core::sumeragi::main_loop: View changed to X: This is a critical indicator of a consensus failure. It means the current consensus round (view) could not finalize a block, often due to timeouts, a lack of quorum (not enough validators responding in time), or a leader failure. Frequent "view changes" point directly to network instability or node health issues.
 *Error/Warning Messages:* Any lines marked ERROR, WARN, or DEBUG provide crucial context about internal service problems, misconfigurations, or external communication issues.
 *Peer Connectivity:* Messages detailing successful or failed connections to TRUSTED_PEERS are important for network health.
 
@@ -266,20 +266,26 @@ While docker compose logs is good for immediate viewing, for long-term auditing,
 
 *Observation:* The Iroha Web UI Explorer currently displays only odd-numbered blocks. Logs from irohad nodes confirm that even-numbered blocks are "received" and voted on, but are not committed, leading to consistent "View changed" messages for those blocks.
 *Root Cause Hypothesis:* This behavior strongly indicates an intermittent failure within the Iroha Sumeragi consensus algorithm, specifically impacting the rounds responsible for finalizing even-numbered blocks. This could be due to:
-*Consensus Timeout:* Nodes (especially the designated leader for even blocks) not responding within the required timeframes.
-*Subtle Network Instability:* Minor, transient network delays or packet loss between peers preventing a quorum for even blocks.
-*Resource Constraints:* A specific node responsible for leading even-block consensus rounds might be intermittently CPU/memory-starved.
-*TRUSTED_PEERS Configuration Errors:* Even a minor mismatch in public keys or addresses in the TRUSTED_PEERS list can silently disrupt communication.
+- *Consensus Timeout:* Nodes (especially the designated leader for even blocks) not responding within the required timeframes.
+- *Subtle Network Instability:* Minor, transient network delays or packet loss between peers preventing a quorum for even blocks.
+- *Resource Constraints:* A specific node responsible for leading even-block consensus rounds might be intermittently CPU/memory-starved.
+- *TRUSTED_PEERS Configuration Errors:* Even a minor mismatch in public keys or addresses in the TRUSTED_PEERS list can silently disrupt communication.
 
 **Initial Troubleshooting for Consensus Issues**
-When faced with consensus issues, systematically verify the following: **Re-verify TRUSTED_PEERS Configuration** (Highly Critical)
-*Absolute Precision:* Ensure that the PUBLIC_KEY environment variable for each irohad node is an exact match for how it appears in the TRUSTED_PEERS list of all other irohad nodes (and its own, if included by design). Even a single character typo invalidates trust.
-*Correct Addresses:* Confirm that the peer_id@service_name:port entries in TRUSTED_PEERS are correct and resolvable within the Docker network (e.g., irohad0:1337, irohad1:1338, etc.).
-*Monitor docker stats closely:* While the system is running and exhibiting the odd/even block problem, continuously run sudo docker stats. Look for any irohad container that shows:
+When faced with consensus issues, systematically verify the following: 
+- *Re-verify TRUSTED_PEERS Configuration* (Highly Critical)
+- *Absolute Precision:* Ensure that the PUBLIC_KEY environment variable for each irohad node is an exact match for how it appears in the TRUSTED_PEERS list of all other irohad nodes (and its own, if included by design). Even a single character typo invalidates trust.
+- *Correct Addresses:* Confirm that the peer_id@service_name:port entries in TRUSTED_PEERS are correct and resolvable within the Docker network (e.g., irohad0:1337, irohad1:1338, etc.).
+- *Monitor docker stats closely:* While the system is running and exhibiting the odd/even block problem, continuously run sudo docker stats.
+
+*Look for any irohad container* that shows:
 - Consistently high CPU usage (e.g., near 100% or more than 1 core).
 - Frequent CPU throttling.
 - High memory usage (approaching its allocated limit).
 - Unusual network I/O patterns.
-- Adjust Health Check & Consensus Timeouts (Experimental): While the healthcheck start_period helps startup, you might experiment with slightly increasing the interval and timeout values in the healthcheck definition for irohad services. This provides more leeway for nodes to respond during consensus. Iroha also has internal consensus timeouts, which might need to be adjusted via environment variables if the network is inherently slow, but this is a more advanced step.
+
+*Adjust Health Check & Consensus Timeouts* (Experimental): 
+While the healthcheck start_period helps startup, you might experiment with slightly increasing the interval and timeout values in the healthcheck definition for irohad services. 
+*Benefits:* This provides more leeway for nodes to respond during consensus. Iroha also has internal consensus timeouts, which might need to be adjusted via environment variables if the network is inherently slow, but this is a more advanced step.
 
 By applying these rigorous configurations and maintaining continuous operational vigilance, you will build a blockchain system that meets the highest standards of reliability and security, akin to the meticulously controlled environments you are accustomed to.
