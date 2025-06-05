@@ -41,12 +41,14 @@ Our recent experience with the Hyperledger Iroha 2.0 network serves as a powerfu
 
 **The Situation:**
 On **May 30, 2025**, our Iroha 2.0 network was observed to be functioning correctly. The blockchain explorer displayed consistent block numbers, including both odd and even heights, indicating a healthy and synchronized multi-node setup. This was clearly documented with a timestamped screenshot, demonstrating a fully functional block-building process.
+![BLocks-Screenshot_2025-05-30_00-46-51](https://github.com/user-attachments/assets/393c3e1e-0d80-4567-8c82-e31729d225b6)
 
 **The Problem Emerges:**
 In the days following this successful observation, the network unexpectedly began exhibiting severe synchronization problems. We encountered:
 * `Temporary failure in name resolution` errors, preventing peer communication.
 * Inconsistent block heights across nodes, leading to `PrevBlockHeightMismatch`.
 * Blocks "disappearing" or not being propagated consistently.
+![block-12-Screenshot_2025-06-04_19-39-59](https://github.com/user-attachments/assets/fee7c5b3-55bc-4d41-b3bb-959d283fde88)
 
 **The Trap:**
 Despite our system's own configurations and troubleshooting, we initially struggled to pinpoint the root cause. Unbeknownst to us, during this period, the main developer of the Iroha 2.0 project was making small, continuous tweaks and additions to the `main` branch of the upstream repository. Each time we pulled the `hyperledger/iroha:2.0.0-rc.2.0` Docker image (which, without a specific SHA digest, can implicitly get updated with the latest `main` branch changes), we inadvertently incorporated these undocumented, potentially unstable modifications.
