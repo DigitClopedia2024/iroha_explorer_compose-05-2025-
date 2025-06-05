@@ -69,8 +69,8 @@ The first step is to identify the precise state of the upstream repository that 
 1.  **Navigate to the Upstream Repository's Commit History:**
     Open your web browser and go to the Hyperledger Iroha repository's commit history: [https://github.com/hyperledger-iroha/iroha/commits/main/](https://github.com/hyperledger-iroha/iroha/commits/main/) (or the relevant branch like `dev`).
 2.  **Locate the Desired Commit:**
-    Scroll through the commit messages and their dates. Identify a commit hash (the long alphanumeric string next to each commit) that was made on or just before your target date (e.g., May 30, 2025).
-    * **Example:** For illustrative purposes, let's assume you found a commit hash like `7c4b6e8a9d1f2c3b4a5d6e7f8c9b0a1d2e3f4a5b` that fits your criteria. **You must replace this with the actual hash you find.**
+    Scroll through the commit messages and their dates. Identify a commit hash (the long alphanumeric string next to each commit) that was made on or just before your target date (e.g., May 30, 2025 see upper screenshot). Here we identified the stable version of 29th May with the full commit hash number 6ec5cfb1f272d6368326281a4c9480527fbd6b7a 
+    * **Example:** For illustrative purposes, let's assume you found a commit hash like `6ec5cfb1f272d6368326281a4c9480527fbd6b7a` that fits your criteria. **You must replace this with the actual hash you find.**
 
 ### Step 5.2: Fork the Upstream Repository
 
@@ -97,7 +97,7 @@ Now, you'll bring your personal copy of the Iroha source code down to your local
 3.  **Checkout the specific commit:**
     This command will move your local repository's state to exactly match the commit hash you identified as stable.
     ```bash
-    git checkout 7c4b6e8a9d1f2c3b4a5d6e7f8c9b0a1d2e3f4a5b
+    git checkout 6ec5cfb1f272d6368326281a4c9480527fbd6b7a
     ```
     (Again, replace with your actual commit hash.)
     * **Note:** This will put you in a "detached HEAD" state, which is fine for building an image. If you plan to make changes to your fork, you'd create a new branch from this commit (`git checkout -b stable-may30-version`).
@@ -110,10 +110,10 @@ With the source code at your desired stable point, you can now build your own Do
 2.  **Build the image:**
     Give your image a clear, descriptive name and tag so you know exactly what it is.
     ```bash
-    docker build -t your-github-username/iroha-stable:2.0.0-may30 .
+    docker build -t your-github-username/iroha-stable:2.0.0-2025may29 .
     ```
     * `-t`: Tags the image with the specified name and tag.
-    * `your-github-username/iroha-stable:2.0.0-may30`: Choose a tag that makes sense for you (e.g., `digitclopedia2024/iroha-stable:2.0.0-may30`).
+    * `your-github-username/iroha-stable:2.0.0-2025may29`: Choose a tag that makes sense for you (e.g., `digitclopedia2024/iroha-stable:2.0.0-2025may29`).
     * `.`: Instructs Docker to build the image using the `Dockerfile` in the current directory.
 
 ### Step 5.5: Update Your `docker-compose.yml`
@@ -140,12 +140,12 @@ Finally, modify your Docker Compose configuration to use your newly built, stabl
     ```yaml
     services:
       irohad0:
-        image: your-github-username/iroha-stable:2.0.0-may30
+        image: your-github-username/iroha-stable:2.0.0-2025may29
         # ... other configurations
       irohad1:
-        image: your-github-username/iroha-stable:2.0.0-may30
+        image: your-github-username/iroha-stable:2.0.0-2025may29
         # ...
     ```
-    (Replace `your-github-username/iroha-stable:2.0.0-may30` with the tag you used in Step 5.4.)
+    (Replace `your-github-username/iroha-stable:2.0.0-2025may29` with the tag you used in Step 5.4.)
 
 Now, when you run `sudo docker compose up -d --build`, Docker Compose will use your custom-built image, ensuring that your Iroha network's core components are based on a known, stable version. This gives you the control and predictability needed to focus on your application development.
