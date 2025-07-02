@@ -1,6 +1,6 @@
-Iroha V2 Stress Test & Scalability Assessment Report
+## Iroha V2 Stress Test & Scalability Assessment Report
 
-Date: July 1, 2025
+Date: *July 1, 2025*
 
 Purpose: This report summarizes the strategic objectives, methodology, findings, and implications of recent stress tests conducted on our Hyperledger Iroha V2 deployment. The primary goal is to validate Iroha V2's suitability for our enterprise-scale content publishing and asset management system, identify potential bottlenecks, and inform future architectural decisions.
 
